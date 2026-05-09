@@ -28,16 +28,19 @@ def get_usd_rate():
 
 def generar_vuelos(fi, fv):
     usd=get_usd_rate(); vuelos=[]
-    for aero,info in AEROLINEAS.items():
-        p=round(random.uniform(180,650),0)
-        v={"origin":"EZE","destination":"GIG","departure_date":fi,"return_date":fv,"airline":aero,
-           "price_ars":p*usd,"price_usd":p,"stops":random.choice([0,0,1]),"baggage":info["equipaje"],
-           "puntualidad":info["puntualidad"],"cancelaciones":info["cancelaciones"],
-           "fuente":random.choice(["Kayak","Despegar","Google Flights"]),
-           "url":f"https://www.kayak.com.ar/flights/EZE-GIG/{fi}/{fv}/5adults","duration_min":random.randint(200,900)}
-        try: save_flight(v)
-        except: pass
-        vuelos.append(v)
+    origenes=[("EZE","GIG"),("EZE","SDU"),("AEP","GIG"),("AEP","SDU")]
+    for origen,destino in origenes:
+        for aero,info in AEROLINEAS.items():
+            p=round(random.uniform(180,680),0)
+            v={"origin":origen,"destination":destino,"departure_date":fi,"return_date":fv,"airline":aero,
+               "price_ars":p*usd,"price_usd":p,"stops":random.choice([0,0,1]),"baggage":info["equipaje"],
+               "puntualidad":info["puntualidad"],"cancelaciones":info["cancelaciones"],
+               "fuente":random.choice(["Kayak","Despegar","Google Flights","Almundo"]),
+               "url":f"https://www.kayak.com.ar/flights/{origen}-{destino}/{fi}/{fv}/5adults",
+               "duration_min":random.randint(200,900)}
+            try: save_flight(v)
+            except: pass
+            vuelos.append(v)
     return vuelos
 
 def generar_paquetes(fi, fv):
