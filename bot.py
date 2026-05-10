@@ -26,6 +26,20 @@ def get_usd_rate():
     try: return float(requests.get("https://dolarapi.com/v1/dolares/blue",timeout=8).json().get("venta",1250))
     except: return 1250.0
 
+def _deep_link(aerolinea, orig, dest, fi, fv, pax=5):
+    if aerolinea == "LATAM":
+        return f"https://www.latamairlines.com/ar/es/oferta-vuelos?origin={orig}&destination={dest}&outbound={fi}&inbound={fv}&adt={pax}&inf=0&chd=0&cabin=Economy&flexDates=false"
+    elif aerolinea == "Copa Airlines":
+        return f"https://booking.copaair.com/es-gs/book/flights?origin={orig}&destination={dest}&departureDate={fi}&returnDate={fv}&adults={pax}&children=0&infants=0&cabin=Economy&tripType=ROUND_TRIP"
+    elif aerolinea == "Azul":
+        return f"https://www.voeazul.com.br/en/home/flight-selection/results?departureCity={orig}&arrivalCity={dest}&departureDate={fi}&returnDate={fv}&adultPassengers={pax}&cabin=EC"
+    elif aerolinea == "Gol":
+        return f"https://www.voegol.com.br/en/results?originAirportCode={orig}&destinationAirportCode={dest}&departureDate={fi}&returnDate={fv}&adults={pax}&children=0&infants=0"
+    elif aerolinea == "Aerolineas Arg.":
+        return f"https://www.aerolineas.com.ar/es-ar/vuelos/resultado?origin={orig}&destination={dest}&departureDate={fi}&returnDate={fv}&adults={pax}&children=0&infants=0&cabin=Y"
+    else:
+        return f"https://www.despegar.com.ar/vuelos/resultado/{orig}/{dest}/{fi}/{fv}/{pax}/0/0/OW/usd/PP/-/-/-/0"
+
 def generar_vuelos(fi, fv):
     usd=get_usd_rate(); vuelos=[]
     origenes=[("EZE","GIG"),("EZE","SDU"),("AEP","GIG"),("AEP","SDU")]
@@ -36,7 +50,7 @@ def generar_vuelos(fi, fv):
                "price_ars":p*usd,"price_usd":p,"stops":random.choice([0,0,1]),"baggage":info["equipaje"],
                "puntualidad":info["puntualidad"],"cancelaciones":info["cancelaciones"],
                "fuente":random.choice(["Kayak","Despegar","Google Flights","Almundo"]),
-               "url":f"https://www.kayak.com.ar/flights/{origen}-{destino}/{fi}/{fv}/5adults",
+               "url":_deep_link(aero, origen, destino, fi, fv),
                "duration_min":random.randint(200,900)}
             try: save_flight(v)
             except: pass
