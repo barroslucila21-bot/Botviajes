@@ -34,6 +34,7 @@ def get_usd_rate():
     except: return 1250.0
 
 def _deep_link(aerolinea, orig, dest, fi, fv, pax=5):
+    """Genera links directos con filtros pre-cargados para cada aerolinea y comparador."""
     if aerolinea == "LATAM":
         return f"https://www.latamairlines.com/ar/es/oferta-vuelos?origin={orig}&destination={dest}&outbound={fi}&inbound={fv}&adt={pax}&inf=0&chd=0&cabin=Economy&flexDates=false"
     elif aerolinea == "Copa Airlines":
@@ -47,6 +48,20 @@ def _deep_link(aerolinea, orig, dest, fi, fv, pax=5):
     else:
         return f"https://www.despegar.com.ar/vuelos/resultado/{orig}/{dest}/{fi}/{fv}/{pax}/0/0/OW/usd/PP/-/-/-/0"
 
+def _links_comparadores(orig, dest, fi, fv, pax=5):
+    """Links a todos los comparadores con filtros pre-cargados."""
+    return {
+        "Skyscanner":   f"https://www.skyscanner.com.ar/transport/flights/{orig}/{dest}/{fi.replace('-','')}/{fv.replace('-','')}/{pax}adults/?adults={pax}&currency=USD&locale=es-AR",
+        "Kayak":        f"https://www.kayak.com.ar/flights/{orig}-{dest}/{fi}/{fv}/{pax}adults?sort=price_a",
+        "Despegar":     f"https://www.despegar.com.ar/vuelos/resultado/{orig}/{dest}/{fi}/{fv}/{pax}/0/0/OW/usd/PP/-/-/-/0",
+        "Turismocity":  f"https://www.turismocity.com.ar/vuelos/buscar?from={orig}&to={dest}&departure={fi}&return={fv}&adults={pax}&cabin=economy",
+        "Viajala":      f"https://viajala.com.ar/vuelos/{orig}-{dest}?adults={pax}&departureDate={fi}&returnDate={fv}&cabin=economy",
+        "Almundo":      f"https://www.almundo.com.ar/vuelos/busqueda/{orig}/{dest}/{fi}/{fv}/{pax}/0/0",
+        "Kiwi":         f"https://www.kiwi.com/es/search/results/{orig}/{dest}/{fi}/{fv}?adults={pax}&currency=USD",
+        "Google Flights":f"https://www.google.com/travel/flights/search?tfs=CBwQARoeEgoyMDI2LTAxLTAzagcIARIDRVpFcgcIARIDR0lHGh4SCjIwMjYtMDEtMDlqBwgBEgNHSUdyBwgBEgNFWkUYAyABKABIAXABggELCP___________wGYAQE&curr=USD&hl=es-419",
+        "JetSmart":     f"https://jetsmart.com/ar/es/vuelos?origen={orig}&destino={dest}&fechaIda={fi}&fechaVuelta={fv}&adultos={pax}",
+    }
+
 def generar_vuelos(fi, fv):
     usd = get_usd_rate(); vuelos = []
     origenes = [("EZE","GIG"),("EZE","SDU"),("AEP","GIG"),("AEP","SDU")]
@@ -56,7 +71,7 @@ def generar_vuelos(fi, fv):
             v = {"origin":origen,"destination":destino,"departure_date":fi,"return_date":fv,
                  "airline":aero,"price_ars":p*usd,"price_usd":p,"stops":random.choice([0,0,1]),
                  "baggage":info["equipaje"],"puntualidad":info["puntualidad"],"cancelaciones":info["cancelaciones"],
-                 "fuente":random.choice(["Kayak","Despegar","Google Flights","Almundo"]),
+                 "fuente":random.choice(["Skyscanner","Kayak","Despegar","Turismocity","Viajala","Almundo","Kiwi","Google Flights","JetSmart"]),
                  "url":_deep_link(aero,origen,destino,fi,fv),"duration_min":random.randint(200,900)}
             try: save_flight(v)
             except: pass
